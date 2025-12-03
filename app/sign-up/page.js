@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Button from "@/components/Button";
 import { useRouter } from "next/navigation";
+import { signUpWithEmail } from "../lib/authHelpers";
 
 function SignUp() {
   const [name, setName] = useState("");
@@ -10,9 +11,21 @@ function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const router = useRouter();
 
-  function submitForm(e) {
+  async function submitForm(e) {
     e.preventDefault();
-    console.log(`Email: ${email} Password: ${password}`);
+    if (!email && !password && !confirmPassword) {
+      alert("Fields cannot be emoty");
+      return;
+    }
+    if (confirmPassword !== password) {
+      alert("Passwords must match");
+      return;
+    }
+
+    const { user, error } = await signUpWithEmail(email, password);
+    if (!error) {
+      router.replace("/home-page");
+    }
   }
 
   return (

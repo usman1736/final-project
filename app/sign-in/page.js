@@ -2,15 +2,25 @@
 import { useState } from "react";
 import Button from "@/components/Button";
 import { useRouter } from "next/navigation";
+import { signinWithEmail } from "../lib/authHelpers";
 
 function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firebaseError, setFirebaseError] = useState(null);
   const router = useRouter();
 
-  function submitForm(e) {
+  async function submitForm(e) {
     e.preventDefault();
-    console.log(`Email: ${email} Password: ${password}`);
+    if (!email && !password) {
+      alert("fields cannot be empty");
+      return;
+    }
+    const { user, error } = await signinWithEmail(email, password);
+    setFirebaseError(error);
+    if (!error) {
+      router.replace("/home-page");
+    }
   }
 
   return (
@@ -56,6 +66,9 @@ function SignIn() {
             buttonFunction={() => router.push("/sign-up")}
           />
         </div>
+        {firebaseError ? (
+          <p className="text-red-600 mt-3">{firebaseError}</p>
+        ) : null}
       </form>
     </main>
   );
