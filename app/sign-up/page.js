@@ -3,6 +3,7 @@ import { useState } from "react";
 import Button from "@/components/Button";
 import { useRouter } from "next/navigation";
 import { signUpWithEmail } from "../lib/authHelpers";
+import { addUser } from "../lib/controllers";
 
 function SignUp() {
   const [name, setName] = useState("");
@@ -14,7 +15,7 @@ function SignUp() {
   async function submitForm(e) {
     e.preventDefault();
     if (!email && !password && !confirmPassword) {
-      alert("Fields cannot be emoty");
+      alert("Fields cannot be empty");
       return;
     }
     if (confirmPassword !== password) {
@@ -24,6 +25,7 @@ function SignUp() {
 
     const { user, error } = await signUpWithEmail(email, password);
     if (!error) {
+      await addUser(name, email, user.uid);
       router.replace("/home-page");
     }
   }
