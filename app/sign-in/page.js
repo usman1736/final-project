@@ -19,7 +19,7 @@ function SignIn() {
     const { user, error } = await signinWithEmail(email, password);
     setFirebaseError(error);
     if (!error) {
-      router.replace("/home-page");
+      router.replace("/home");
     }
   }
 
