@@ -96,7 +96,7 @@ function SignUp() {
         />
         <div className="flex justify-center gap-5 w-screen mt-10">
           <Button name={"Sign Up"} buttonFunction={(e) => submitForm(e)} />
-          <Button name={"Home"} buttonFunction={() => router.push("/")} />
+          <Button name={"Sign In"} buttonFunction={() => router.push("/sign-in")} />
         </div>
       </form>
     </main>
