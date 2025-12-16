@@ -26,7 +26,7 @@ function SignUp() {
     const { user, error } = await signUpWithEmail(email, password);
     if (!error) {
       await addUser(name, email, user.uid);
-      router.replace("/home-page");
+      router.replace("/home");
     }
   }
 
