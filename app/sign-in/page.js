@@ -59,7 +59,7 @@ function SignIn() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
         />
-        <div className="flex justify-center gap-5 w-screen mt-10">
+        <div className="flex justify-center gap-5 w-screen mt-10 text-white">
           <Button name={"Sign In"} buttonFunction={(e) => submitForm(e)} />
           <Button
             name={"Sign Up"}

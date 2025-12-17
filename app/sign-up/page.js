@@ -94,7 +94,7 @@ function SignUp() {
           onChange={(e) => setConfirmPassword(e.target.value)}
           placeholder="Confirm Password"
         />
-        <div className="flex justify-center gap-5 w-screen mt-10">
+        <div className="flex justify-center gap-5 w-screen mt-10 text-white">
           <Button name={"Sign Up"} buttonFunction={(e) => submitForm(e)} />
           <Button name={"Sign In"} buttonFunction={() => router.push("/sign-in")} />
         </div>

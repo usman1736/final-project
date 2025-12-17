@@ -13,7 +13,7 @@ function Page() {
           TaskFlow
         </h1>
       </header>
-      <div className="flex justify-center gap-5 w-screen mt-40">
+      <div className="flex justify-center gap-5 w-screen mt-40 text text-white">
         <Button
           name={"Sign In"}
           buttonFunction={() => router.push("/sign-in")}
