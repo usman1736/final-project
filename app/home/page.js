@@ -202,9 +202,10 @@ const handleSignout = async () => {
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
           <div className="bg-gray-100 p-12 rounded-xl w-full max-w-xl shadow-xl">
-            <h2 className="text-2xl text to-black font-bold mb-8 text-center">
-              {editingId ? "Edit Task" : "Add Task"}
-            </h2>
+            <h2 className="text-2xl font-bold mb-8 text-center text-black">
+  {editingId ? "Edit Task" : "Add Task"}
+</h2>
+
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
               <input
