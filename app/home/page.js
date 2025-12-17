@@ -213,7 +213,7 @@ const handleSignout = async () => {
                 placeholder="Task name"
                 value={task}
                 onChange={(e) => setTask(e.target.value)}
-                className="px-4 py-3 rounded-md"
+               className="px-4 py-3 rounded-md border border-black placeholder-gray-600 focus:outline-none focus:ring-0"
                 required
               />
 
