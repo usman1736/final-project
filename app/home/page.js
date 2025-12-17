@@ -210,7 +210,7 @@ const handleSignout = async () => {
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
               <input
                 type="text"
-                placeholder="Task name"
+                placeholder="Task"
                 value={task}
                 onChange={(e) => setTask(e.target.value)}
                className="px-4 py-3 rounded-md border border-black placeholder-gray-600 focus:outline-none focus:ring-0"
