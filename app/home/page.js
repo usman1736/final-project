@@ -221,7 +221,7 @@ const handleSignout = async () => {
                 type="datetime-local"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="px-4 py-3 rounded-md"
+                className="px-4 py-3 rounded-md border border-black placeholder-gray-600 focus:outline-none focus:ring-0"
                 required
               />
 
