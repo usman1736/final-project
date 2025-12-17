@@ -1,7 +1,5 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { onSnapshot, collection } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
 export function useFirestoreCollection(uid, collectionName = "users") {
@@ -10,6 +8,13 @@ export function useFirestoreCollection(uid, collectionName = "users") {
   const [dataError, setDataError] = useState(null);
 
   useEffect(() => {
+    
+    if (!uid) {
+      setData([]);
+      setIsDataLoading(false);
+      return;
+    }
+
     const unsubscribe = onSnapshot(
       collection(db, collectionName, uid, "tasks"),
       (snapshot) => {
@@ -29,5 +34,6 @@ export function useFirestoreCollection(uid, collectionName = "users") {
 
     return unsubscribe;
   }, [collectionName, uid]);
+
   return { data, isDataLoading, dataError };
 }
