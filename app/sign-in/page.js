@@ -67,7 +67,7 @@ function SignIn() {
           />
         </div>
         {firebaseError ? (
-          <p className="text-red-600 mt-3">{firebaseError}</p>
+          <p className="text-red-600 mt-3">invalid credentials. Please try again</p>
         ) : null}
       </form>
     </main>
