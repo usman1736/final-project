@@ -130,7 +130,7 @@ const handleSignout = async () => {
 
       {/* header */}
       <div className="w-full max-w-3xl flex justify-between items-center mb-8">
-        <p className="text-xl font-medium">Welcome {userName}</p>
+        <p className="text-xl font-medium text-black">Welcome {userName}</p>
 
         <button
           onClick={() => {
@@ -139,7 +139,7 @@ const handleSignout = async () => {
             setEditingId(null);
             setShowModal(true);
           }}
-          className="bg-black text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition"
+          className=" text-black w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition"
           aria-label="Add Task"
         >
           <Plus size={26} />
@@ -202,7 +202,7 @@ const handleSignout = async () => {
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
           <div className="bg-gray-100 p-12 rounded-xl w-full max-w-xl shadow-xl">
-            <h2 className="text-2xl font-bold mb-8 text-center">
+            <h2 className="text-2xl text to-black font-bold mb-8 text-center">
               {editingId ? "Edit Task" : "Add Task"}
             </h2>
 
