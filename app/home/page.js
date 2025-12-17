@@ -11,35 +11,26 @@ import {
   updateDoc,
   serverTimestamp,
 } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
-
-import Button from "@/components/Button";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { Pencil, Trash2, Plus } from "lucide-react";
 
 import { db, auth } from "../lib/firebase";
 import { useFirestoreCollection } from "../hooks/useFirestoreCollection";
-import { signOut } from "firebase/auth";
-
 
 export default function HomePage() {
   const router = useRouter();
 
-  
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
-
-  //user-info
   const [userName, setUserName] = useState("");
 
-  //task
   const [task, setTask] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  
   useEffect(() => {
-    const removeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (!firebaseUser) {
         router.replace("/sign-in");
         return;
@@ -48,7 +39,6 @@ export default function HomePage() {
       setUser(firebaseUser);
       setAuthLoading(false);
 
-      // Fetch userinfo
       const ref = doc(db, "users", firebaseUser.uid);
       const snap = await getDoc(ref);
       if (snap.exists()) {
@@ -56,31 +46,29 @@ export default function HomePage() {
       }
     });
 
-    return removeAuth;
+    return unsubscribe;
   }, [router]);
 
-  
   const { data: tasks } = useFirestoreCollection(user?.uid, "users");
 
-  // add or edit
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!user) return;
 
+    const taskData = {
+      title: task,
+      completed: false,
+      createdAt: serverTimestamp(),
+    };
+
+    if (dueDate) {
+      taskData.dueDate = new Date(dueDate);
+    }
+
     if (editingId) {
-      await updateDoc(doc(db, "tasks", editingId), {
-        title: task,
-        dueDate: new Date(dueDate),
-      });
+      await updateDoc(doc(db, "users", user.uid, "tasks", editingId), taskData);
     } else {
-      await addDoc(collection(db, "tasks"), {
-        title: task,
-        completed: false,
-        dueDate: new Date(dueDate),
-        uid: user.uid,
-        createdAt: serverTimestamp(),
-      });
+      await addDoc(collection(db, "users", user.uid, "tasks"), taskData);
     }
 
     setTask("");
@@ -89,48 +77,50 @@ export default function HomePage() {
     setShowModal(false);
   };
 
-  // check box toggle
   const toggleComplete = async (item) => {
-    await updateDoc(doc(db, "tasks", item.id), {
+    await updateDoc(doc(db, "users", user.uid, "tasks", item.id), {
       completed: !item.completed,
     });
   };
 
-  // edit
   const handleEdit = (item) => {
     setTask(item.title);
-    setDueDate(new Date(item.dueDate.toDate()).toISOString().slice(0, 16));
+    setDueDate(
+      item.dueDate
+        ? new Date(item.dueDate.toDate()).toISOString().slice(0, 16)
+        : ""
+    );
     setEditingId(item.id);
     setShowModal(true);
   };
 
-  // delete
   const handleDelete = async (id) => {
-    await deleteDoc(doc(db, "tasks", id));
+    await deleteDoc(doc(db, "users", user.uid, "tasks", id));
   };
-  // signout
-const handleSignout = async () => {
-  await signOut(auth);
-  router.replace("/sign-in");
-};
 
-
+  const handleSignout = async () => {
+    await signOut(auth);
+    router.replace("/sign-in");
+  };
 
   if (authLoading) {
     return (
-      <div className="h-screen flex items-center justify-center text-xl">
+      <div className="h-screen flex items-center justify-center text-xl text-black dark:text-white">
         Loading...
       </div>
     );
   }
 
   return (
-    <main className="bg-gray-300 min-h-screen w-screen flex flex-col items-center p-10">
-      <h1 className="text-black text-5xl font-extrabold mb-10">TaskFlow</h1>
+    <main className="bg-gray-300 dark:bg-black min-h-screen w-screen flex flex-col items-center p-10">
+      <h1 className="text-black dark:text-white text-5xl font-extrabold mb-10">
+        TaskFlow
+      </h1>
 
-      {/* header */}
       <div className="w-full max-w-3xl flex justify-between items-center mb-8">
-        <p className="text-xl font-medium text-black">Welcome {userName}</p>
+        <p className="text-xl font-medium text-black dark:text-white">
+          Welcome {userName}
+        </p>
 
         <button
           onClick={() => {
@@ -139,20 +129,17 @@ const handleSignout = async () => {
             setEditingId(null);
             setShowModal(true);
           }}
-          className=" text-black w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition"
-          aria-label="Add Task"
+          className="text-black dark:text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition"
         >
           <Plus size={26} />
-      
         </button>
       </div>
 
-      {/* task lis */}
       <div className="w-full max-w-3xl space-y-6">
         {tasks.map((item) => (
           <div
             key={item.id}
-            className="flex items-center justify-between bg-gray-100 px-6 py-5 rounded-xl shadow"
+            className="flex items-center justify-between bg-gray-100 dark:bg-gray-800 px-6 py-5 rounded-xl shadow"
           >
             <div className="flex items-center gap-4">
               <input
@@ -164,32 +151,31 @@ const handleSignout = async () => {
 
               <div>
                 <div
-                  className={`font-semibold ${
+                  className={`font-semibold text-black dark:text-white ${
                     item.completed ? "line-through opacity-60" : ""
                   }`}
                 >
                   {item.title}
                 </div>
                 {item.dueDate && (
-                  <div className="text-sm text-gray-700">
+                  <div className="text-sm text-gray-700 dark:text-gray-300">
                     Due: {item.dueDate.toDate().toLocaleString()}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Edit & delete icons */}
             <div className="flex gap-3">
               <button
                 onClick={() => handleEdit(item)}
-                className="bg-black text-white w-10 h-10 rounded-full flex items-center justify-center hover:scale-105 transition"
+                className="bg-black dark:bg-white text-white dark:text-black w-10 h-10 rounded-full flex items-center justify-center"
               >
                 <Pencil size={18} />
               </button>
 
               <button
                 onClick={() => handleDelete(item.id)}
-                className="bg-black text-white w-10 h-10 rounded-full flex items-center justify-center hover:scale-105 transition"
+                className="bg-black dark:bg-white text-white dark:text-black w-10 h-10 rounded-full flex items-center justify-center"
               >
                 <Trash2 size={18} />
               </button>
@@ -198,14 +184,12 @@ const handleSignout = async () => {
         ))}
       </div>
 
-      {/* modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
-          <div className="bg-gray-100 p-12 rounded-xl w-full max-w-xl shadow-xl">
-            <h2 className="text-2xl font-bold mb-8 text-center text-black">
-  {editingId ? "Edit Task" : "Add Task"}
-</h2>
-
+          <div className="bg-gray-100 dark:bg-gray-900 p-12 rounded-xl w-full max-w-xl shadow-xl">
+            <h2 className="text-2xl font-bold mb-8 text-center text-black dark:text-white">
+              {editingId ? "Edit Task" : "Add Task"}
+            </h2>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
               <input
@@ -213,7 +197,7 @@ const handleSignout = async () => {
                 placeholder="Task"
                 value={task}
                 onChange={(e) => setTask(e.target.value)}
-               className="px-4 py-3 rounded-md border border-black placeholder-gray-600 focus:outline-none focus:ring-0"
+                className="px-4 py-3 rounded-md border border-black dark:border-gray-600 bg-white dark:bg-gray-800 text-black dark:text-white"
                 required
               />
 
@@ -221,22 +205,21 @@ const handleSignout = async () => {
                 type="datetime-local"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="px-4 py-3 rounded-md border border-black placeholder-gray-600 focus:outline-none focus:ring-0"
-                required
+                className="px-4 py-3 rounded-md border border-black dark:border-gray-600 bg-white dark:bg-gray-800 text-black dark:text-white"
               />
 
               <div className="flex justify-center gap-6">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="bg-white text-black px-6 py-2 rounded-md shadow hover:bg-gray-200 transition"
+                  className="bg-white dark:bg-gray-700 text-black dark:text-white px-6 py-2 rounded-md shadow"
                 >
                   Cancel
                 </button>
 
                 <button
                   type="submit"
-                  className="bg-white text-black px-6 py-2 rounded-md shadow hover:bg-gray-200 transition"
+                  className="bg-white dark:bg-gray-700 text-black dark:text-white px-6 py-2 rounded-md shadow"
                 >
                   {editingId ? "Save" : "Add"}
                 </button>
@@ -245,22 +228,13 @@ const handleSignout = async () => {
           </div>
         </div>
       )}
-      {/* signout button */}
-<button
-  onClick={handleSignout}
-  className="
-    fixed bottom-6 right-6
-    bg-black text-white
-    px-6 py-3
-    rounded-full
-    shadow-lg
-    hover:bg-gray-800
-    transition
-  "
->
-  Sign Out
-</button>
 
+      <button
+        onClick={handleSignout}
+        className="fixed bottom-6 right-6 bg-black dark:bg-white text-white dark:text-black px-6 py-3 rounded-full shadow-lg"
+      >
+        Sign Out
+      </button>
     </main>
   );
 }

@@ -8,10 +8,7 @@ export function useFirestoreCollection(uid, collectionName = "users") {
   const [dataError, setDataError] = useState(null);
 
   useEffect(() => {
-    
     if (!uid) {
-      setData([]);
-      setIsDataLoading(false);
       return;
     }
 
@@ -32,7 +29,7 @@ export function useFirestoreCollection(uid, collectionName = "users") {
       }
     );
 
-    return unsubscribe;
+    return () => unsubscribe();
   }, [collectionName, uid]);
 
   return { data, isDataLoading, dataError };
