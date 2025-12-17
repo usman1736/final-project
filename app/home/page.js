@@ -18,6 +18,8 @@ import { Pencil, Trash2, Plus } from "lucide-react";
 
 import { db, auth } from "../lib/firebase";
 import { useFirestoreCollection } from "../hooks/useFirestoreCollection";
+import { signOut } from "firebase/auth";
+
 
 export default function HomePage() {
   const router = useRouter();
@@ -106,6 +108,12 @@ export default function HomePage() {
   const handleDelete = async (id) => {
     await deleteDoc(doc(db, "tasks", id));
   };
+  // signout
+const handleSignout = async () => {
+  await signOut(auth);
+  router.replace("/sign-in");
+};
+
 
 
   if (authLoading) {
@@ -135,6 +143,7 @@ export default function HomePage() {
           aria-label="Add Task"
         >
           <Plus size={26} />
+      
         </button>
       </div>
 
@@ -235,6 +244,22 @@ export default function HomePage() {
           </div>
         </div>
       )}
+      {/* signout button */}
+<button
+  onClick={handleSignout}
+  className="
+    fixed bottom-6 right-6
+    bg-black text-white
+    px-6 py-3
+    rounded-full
+    shadow-lg
+    hover:bg-gray-800
+    transition
+  "
+>
+  Sign Out
+</button>
+
     </main>
   );
 }
